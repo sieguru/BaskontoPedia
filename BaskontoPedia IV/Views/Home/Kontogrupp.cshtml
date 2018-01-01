@@ -1,0 +1,35 @@
+﻿@model BaskontoPedia_IV.Controllers.AccountGroupViewModel
+
+@{
+    ViewBag.Title = "Kontogrupp";
+}
+
+<h2>Kontogrupp</h2>
+
+
+<table class="table">
+    <tr>
+        <th>Kontonr</th>
+        <th>Kontonamn</th>
+        <th>Huvudkontot används av</th>
+        <th>Underkonton används av</th>
+        <th>Företag med mer än ett underkonto</th>
+   </tr>
+
+    @foreach (var item in Model.Accounts)
+    {
+    <tr>
+        <td>
+            @Html.ActionLink(item.AccountId + "x", "Huvudkonto/" + item.AccountId, "Home")
+
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Name)
+        </td>
+        <td>1%</td>
+        <td>1%</td>
+        <td>1%</td>
+    </tr>
+    }
+
+</table>

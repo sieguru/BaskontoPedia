@@ -1,0 +1,53 @@
+﻿@model BaskontoPedia_IV.Controllers.XbrlViewModel
+
+@{
+    ViewBag.Title = "Kontogrupp";
+}
+
+<h2>XBRL-element <code>@Model.Element.ElementName</code></h2>
+
+<dl class="dl-horizontal">
+    <dt>Rubrik</dt>
+    <dd>@Model.Element.Name</dd>
+    <dt>Standardrubrik</dt>
+    <dd>@Model.Element.Standardrubrik</dd>
+    <dt>Dokumentation</dt>
+    <dd>@Model.Element.Dokumentation</dd>
+    <dt>Saldo</dt>
+    <dd>@Model.Element.Saldo</dd>
+    <dt>Datatyp</dt>
+    <dd>@Model.Element.Datatyp</dd>
+    <dt>Placering</dt>
+    <dd>@Model.Element.Header1/@Model.Element.Header2/@Model.Element.Header3/@Model.Element.Header4/@Model.Element.Header5 </dd>
+    <dt>Omfattar konton</dt>
+    <dd>@Model.Element.Konton</dd>
+</dl>
+
+
+
+<table class="table">
+    <tr>
+        <th>Kontonr</th>
+        <th>Kontonamn</th>
+        <th>Huvudkontot används av</th>
+        <th>Underkonton används av</th>
+        <th>Företag med mer än ett underkonto</th>
+    </tr>
+
+    @foreach (var item in Model.Accounts)
+    {
+        <tr>
+            <td>
+                @Html.ActionLink(item.AccountId, "Huvudkonto/" + item.AccountId, "Home")
+
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>1%</td>
+            <td>1%</td>
+            <td>1%</td>
+        </tr>
+    }
+
+</table>
