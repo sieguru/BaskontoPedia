@@ -6,8 +6,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{DFB3AFA8-D7B2-43A6-A2DF-21B7A299DB30}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>SieClient</RootNamespace>
-    <AssemblyName>SieClient</AssemblyName>
+    <RootNamespace>Sie4Reader</RootNamespace>
+    <AssemblyName>Sie4Reader</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -51,6 +51,7 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RecordClasses.cs" />
     <Compile Include="SieMotor.cs" />
   </ItemGroup>
   <ItemGroup>

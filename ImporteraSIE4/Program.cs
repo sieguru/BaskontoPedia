@@ -7,43 +7,84 @@ using System.IO;
 using System.Reflection;
 using System.Threading;
 using SQLDatabase;
+using Sie4Reader;
 
 namespace SieClient
 {
 
    class Program
    {
-      //Encoding enc = Encoding.GetEncoding(1252);
-      //string result = enc.GetString(bytes);
-      //var asciiBytes = new byte[] { 0x94 }; // 94 corresponds represents 'ö' in code page 437.
-
-      //Encoding OemEncoding = Encoding.GetEncoding(437);
-
-      //var unicodeString = asciiEncoding.GetString(asciiBytes);
 
       // Programmet baserar sig på ett exempel från https://sieguru.se/2016/11/03/att-lasa-en-sie-fil/
       static void Main(string[] args)
       {
-         //var model = new BASContext(false);
-         var sieMotor = new SieMotor();
-         sieMotor.SetCallback_Konto(KontoCallback);
+         var model = new BASContext(false);
+         //var sieMotor = new SieMotor();
+         //sieMotor.SetCallback_Konto(KontoCallback);
 
          Console.WriteLine("Working...");
  //        var text = File.ReadAllText(@"D:\BaskontoPedia\SIE4\transaktioner_ovnbolag.se", Encoding.GetEncoding(437));
 
 
-         sieMotor.LesFil(@"D:\BaskontoPedia\SIE4\transaktioner_ovnbolag.se", FELHANTERING.FORTSETT_VID_FEL);
-         sieMotor.LesFil(@"D:\BaskontoPedia\SIE4\transaktioner_ovnbolag.se", FELHANTERING.FORTSETT_VID_FEL);
-         sieMotor.LesFil(@"D:\BaskontoPedia\SIE4\transaktioner_ovnbolag.se", FELHANTERING.FORTSETT_VID_FEL);
-         sieMotor.LesFil(@"D:\BaskontoPedia\SIE4\transaktioner_ovnbolag.se", FELHANTERING.FORTSETT_VID_FEL);
-         sieMotor.LesFil(@"D:\BaskontoPedia\SIE4\transaktioner_ovnbolag.se", FELHANTERING.FORTSETT_VID_FEL);
+         Reader.Read(model, @"D:\BaskontoPedia\SIE4\BL0001_typ4.SE");
+         Reader.Read(model, @"D:\BaskontoPedia\SIE4\Bokslut Norstedts SIE 4E.se");
+         Reader.Read(model, @"D:\BaskontoPedia\SIE4\live2011.se");
+         Reader.Read(model, @"D:\BaskontoPedia\SIE4\magenta_bokföring_SIE4E.se");
+         Reader.Read(model, @"D:\BaskontoPedia\SIE4\MAMUT_SIE4_EXPORT.SE");
+         Reader.Read(model, @"D:\BaskontoPedia\SIE4\sie 4.SE");
+         Reader.Read(model, @"D:\BaskontoPedia\SIE4\SIE_exempelfil.se");
+         Reader.Read(model, @"D:\BaskontoPedia\SIE4\Sie4 (1).se");
+         Reader.Read(model, @"D:\BaskontoPedia\SIE4\sie4 (2).se");
+         //new Reader(model, @"D:\BaskontoPedia\SIE4\SIE4 (3).SE");  // Trasig fil
+         Reader.Read(model, @"D:\BaskontoPedia\SIE4\SIE4 (4).se");
+         Reader.Read(model, @"D:\BaskontoPedia\SIE4\Sie4.se");
+         Reader.Read(model, @"D:\BaskontoPedia\SIE4\Test4.SE");
+         Reader.Read(model, @"D:\BaskontoPedia\SIE4\transaktioner_ovnbolag.se");
+         Reader.Read(model, @"D:\BaskontoPedia\SIE4\typ4 (1).se");
+        // sieMotor.LesFil(@"D:\BaskontoPedia\SIE4\XE_SIE_4_20151125095119.SE", FELHANTERING.FORTSETT_VID_FEL);
 
          //model.SaveChanges();
       }
 
-      static void KontoCallback(string kontonr, string namn)
+      //static void KontoCallback(string kontonr, string namn)
+      //{
+      //   Console.WriteLine("{0} {1}", kontonr, namn);
+      //}
+   }
+
+   public class Reader
+   {
+      BASContext Model { get; set; }
+      string Filename { get; set; }
+      public static void Read(BASContext model, string filename)
       {
-         Console.WriteLine("{0} {1}", kontonr, namn);
+         var reader = new Reader
+         {
+            Model = model,
+            Filename = filename,
+         };
+
+         reader.ReadFile();
+      }
+      public void ReadFile()
+      {
+         var sieMotor = new SieMotor();
+         sieMotor.SetCallback(ItemCallback);
+         sieMotor.LesFil(Filename, FELHANTERING.FORTSETT_VID_FEL);
+      }
+
+      void ItemCallback(object item)
+      {
+         if (item.GetType() == typeof(SieKONTO))
+         {
+            var konto = (SieKONTO)item;
+
+            Console.WriteLine("{0} {1}", konto.Kontonr, konto.Namn);
+         }
+         else
+         {
+            Console.WriteLine("Item: {0}", item);
+         }
       }
    }
 }

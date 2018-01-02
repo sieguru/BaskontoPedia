@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Sie4Reader;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -65,29 +66,15 @@ namespace SieClient
    {
    }
 
-   public class SieVER
-   {
-   }
-   public class SieKONTO
-   {
-      public string Kontonr { get; set; }
-      public string Namn { get; set; }
-   }
-
-   public class SieTRANS
-   {
-
-   }
-
-   public delegate void DelKonto(string id, string orgnr);
+   public delegate void DelItem(object item);
 
    public class SieMotor
    {
-      DelKonto _CallbackKonto;
+      DelItem _Callback;
 
-      public void SetCallback_Konto(DelKonto del)
+      public void SetCallback(DelItem del)
       {
-         _CallbackKonto += del;
+         _Callback += del;
       }
 
       static List<Posttyp> Posttyper = new List<Posttyp>{
@@ -156,13 +143,13 @@ namespace SieClient
       bool m_ver_flagga;
       bool m_klammer_aktiv;
 
-      public virtual void Initiera()
-      {
-      }
+      //public virtual void Initiera()
+      //{
+      //}
 
-      public virtual void Avsluta()
-      {
-      }
+      //public virtual void Avsluta()
+      //{
+      //}
 
       public SieMotor()
       {
@@ -397,12 +384,52 @@ namespace SieClient
 #endif
          switch (del_felt[0])
          {
-            case "#KONTO":
-               ProcessKONTO(del_felt);
-               break;
-            case "#TRANS":
-               ProcessTRANS(del_felt);
-               break;
+            case "#FLAGGA": ProcessFLAGGA(del_felt); break;
+            case "#PROGRAM": ProcessPROGRAM(del_felt); break;
+            case "#FORMAT": ProcessFORMAT(del_felt); break;
+            case "#GEN": ProcessGEN(del_felt); break;
+            case "#FILTYP": ProcessFILTYP(del_felt); break;
+            case "#SIETYP": ProcessSIETYP(del_felt); break;
+            case "#PROSA": ProcessPROSA(del_felt); break;
+            case "#ENHET": ProcessENHET(del_felt); break;
+            case "#FNR": ProcessFNR(del_felt); break;
+            case "#FTYP": ProcessFTYP(del_felt); break;
+            case "#ORGNR": ProcessORGNR(del_felt); break;
+            case "#BKOD": ProcessBKOD(del_felt); break;
+            case "#ADRESS": ProcessADRESS(del_felt); break;
+            case "#FNAMN": ProcessFNAMN(del_felt); break;
+            case "#RAR": ProcessRAR(del_felt); break;
+            case "#TAXAR": ProcessTAXAR(del_felt); break;
+            case "#OMFATTN": ProcessOMFATTN(del_felt); break;
+            case "#KONTO": ProcessKONTO(del_felt); break;
+            case "#KTYP": ProcessKTYP(del_felt); break;
+            case "#SRU": ProcessSRU(del_felt); break;
+            case "#DIM": ProcessDIM(del_felt); break;
+            case "#UNDERDIM": ProcessUNDERDIM(del_felt); break;
+            case "#OBJEKT": ProcessOBJEKT(del_felt); break;
+            case "#IB": ProcessIB(del_felt); break;
+            case "#UB": ProcessUB(del_felt); break;
+            case "#RES": ProcessRES(del_felt); break;
+            case "#OUB": ProcessOUB(del_felt); break;
+            case "#OIB": ProcessOIB(del_felt); break;
+            case "#PSALDO": ProcessPSALDO(del_felt); break;
+            case "#PBUDGET": ProcessPBUDGET(del_felt); break;
+            case "#VER": ProcessVER(del_felt); break;
+            case "#TRANS": ProcessTRANS(del_felt); break;
+            case "#RTRANS": ProcessRTRANS(del_felt); break;
+            case "#BTRANS": ProcessBTRANS(del_felt); break;
+            case "#KPTYP": ProcessKPTYP(del_felt); break;
+            case "#LEV": ProcessLEV(del_felt); break;
+            case "#LEVADR": ProcessLEVADR(del_felt); break;
+            case "#LEVBETINFO": ProcessLEVBETINFO(del_felt); break;
+            case "#LEVREF": ProcessLEVREF(del_felt); break;
+            case "#KUND": ProcessKUND(del_felt); break;
+            case "#KUNDADR": ProcessKUNDADR(del_felt); break;
+            case "#KUNDBETINFO": ProcessKUNDBETINFO(del_felt); break;
+            case "#KUNDREF": ProcessKUNDREF(del_felt); break;
+            case "#KSUMMA": ProcessKSUMMA(del_felt); break;
+            case "#VALUTA": ProcessVALUTA(del_felt); break;
+
             default:
                // Okänd posttyp
                break;
@@ -420,7 +447,7 @@ namespace SieClient
          //}
       }
 
-      static Regex regexQuotedString = new Regex("^\\s*\"([^\"^}]+)\"", RegexOptions.CultureInvariant); // "^\\s*([\"'])(?:(?=(\\\\?))\\2.)*?\\1"); 
+      static Regex regexQuotedString = new Regex("^\\s*\"([^\"^}]*)\"", RegexOptions.CultureInvariant); // "^\\s*([\"'])(?:(?=(\\\\?))\\2.)*?\\1"); 
       static Regex regexCurlyBrackets = new Regex("^\\s*\\{(.+)\\}", RegexOptions.CultureInvariant);
       static Regex regexLiteral = new Regex("^\\s*([^\\s^\"]+)", RegexOptions.CultureInvariant);
 
@@ -467,6 +494,177 @@ namespace SieClient
 
          return parts.ToArray();
       }
+
+      private void ProcessFLAGGA(string[] del_felt)
+      {
+         var item = new SieFLAGGA
+         {
+            //Kontonr = del_felt[1],
+            //Namn = del_felt[2],
+         };
+
+         _Callback?.Invoke(item);
+      }
+      private void ProcessPROGRAM(string[] del_felt)
+      {
+         var item = new SiePROGRAM
+         {
+            //Kontonr = del_felt[1],
+            //Namn = del_felt[2],
+         };
+
+         _Callback?.Invoke(item);
+      }
+      private void ProcessFORMAT(string[] del_felt)
+      {
+         var item = new SieFORMAT
+         {
+            //Kontonr = del_felt[1],
+            //Namn = del_felt[2],
+         };
+
+         _Callback?.Invoke(item);
+      }
+      private void ProcessGEN(string[] del_felt)
+      {
+         var item = new SieGEN
+         {
+            //Kontonr = del_felt[1],
+            //Namn = del_felt[2],
+         };
+
+         _Callback?.Invoke(item);
+      }
+      private void ProcessFILTYP(string[] del_felt)
+      {
+         var item = new SieFILTYP
+         {
+            //Kontonr = del_felt[1],
+            //Namn = del_felt[2],
+         };
+
+         _Callback?.Invoke(item);
+      }
+      private void ProcessSIETYP(string[] del_felt)
+      {
+         var item = new SieSIETYP
+         {
+            //Kontonr = del_felt[1],
+            //Namn = del_felt[2],
+         };
+
+         _Callback?.Invoke(item);
+      }
+      private void ProcessPROSA(string[] del_felt)
+      {
+         var item = new SiePROSA
+         {
+            //Kontonr = del_felt[1],
+            //Namn = del_felt[2],
+         };
+
+         _Callback?.Invoke(item);
+      }
+      private void ProcessENHET(string[] del_felt)
+      {
+         var item = new SieENHET
+         {
+            //Kontonr = del_felt[1],
+            //Namn = del_felt[2],
+         };
+
+         _Callback?.Invoke(item);
+      }
+      private void ProcessFNR(string[] del_felt)
+      {
+         var item = new SieFNR
+         {
+            //Kontonr = del_felt[1],
+            //Namn = del_felt[2],
+         };
+
+         _Callback?.Invoke(item);
+      }
+      private void ProcessFTYP(string[] del_felt)
+      {
+         var item = new SieFTYP
+         {
+            //Kontonr = del_felt[1],
+            //Namn = del_felt[2],
+         };
+
+         _Callback?.Invoke(item);
+      }
+      private void ProcessORGNR(string[] del_felt)
+      {
+         var item = new SieORGNR
+         {
+            //Kontonr = del_felt[1],
+            //Namn = del_felt[2],
+         };
+
+         _Callback?.Invoke(item);
+      }
+      private void ProcessBKOD(string[] del_felt)
+      {
+         var item = new SieBKOD
+         {
+            //Kontonr = del_felt[1],
+            //Namn = del_felt[2],
+         };
+
+         _Callback?.Invoke(item);
+      }
+      private void ProcessADRESS(string[] del_felt)
+      {
+         var item = new SieADRESS
+         {
+            //Kontonr = del_felt[1],
+            //Namn = del_felt[2],
+         };
+
+         _Callback?.Invoke(item);
+      }
+      private void ProcessFNAMN(string[] del_felt)
+      {
+         var item = new SieFNAMN
+         {
+            //Kontonr = del_felt[1],
+            //Namn = del_felt[2],
+         };
+
+         _Callback?.Invoke(item);
+      }
+      private void ProcessRAR(string[] del_felt)
+      {
+         var item = new SieRAR
+         {
+            //Kontonr = del_felt[1],
+            //Namn = del_felt[2],
+         };
+
+         _Callback?.Invoke(item);
+      }
+      private void ProcessTAXAR(string[] del_felt)
+      {
+         var item = new SieTAXAR
+         {
+            //Kontonr = del_felt[1],
+            //Namn = del_felt[2],
+         };
+
+         _Callback?.Invoke(item);
+      }
+      private void ProcessOMFATTN(string[] del_felt)
+      {
+         var item = new SieOMFATTN
+         {
+            //Kontonr = del_felt[1],
+            //Namn = del_felt[2],
+         };
+
+         _Callback?.Invoke(item);
+      }
       private void ProcessKONTO(string[] del_felt)
       {
          var item = new SieKONTO
@@ -475,17 +673,283 @@ namespace SieClient
             Namn = del_felt[2],
          };
 
-         _CallbackKonto?.Invoke(item.Kontonr, item.Namn);
-
+         _Callback?.Invoke(item);
       }
+      private void ProcessKTYP(string[] del_felt)
+      {
+         var item = new SieKPTYP
+         {
+            //Kontonr = del_felt[1],
+            //Namn = del_felt[2],
+         };
 
+         _Callback?.Invoke(item);
+      }
+      private void ProcessSRU(string[] del_felt)
+      {
+         var item = new SieSRU
+         {
+            //Kontonr = del_felt[1],
+            //Namn = del_felt[2],
+         };
+
+         _Callback?.Invoke(item);
+      }
+      private void ProcessDIM(string[] del_felt)
+      {
+         var item = new SieDIM
+         {
+            //Kontonr = del_felt[1],
+            //Namn = del_felt[2],
+         };
+
+         _Callback?.Invoke(item);
+      }
+      private void ProcessUNDERDIM(string[] del_felt)
+      {
+         var item = new SieUNDERDIM
+         {
+            //Kontonr = del_felt[1],
+            //Namn = del_felt[2],
+         };
+
+         _Callback?.Invoke(item);
+      }
+      private void ProcessOBJEKT(string[] del_felt)
+      {
+         var item = new SieOBJEKT
+         {
+            //Kontonr = del_felt[1],
+            //Namn = del_felt[2],
+         };
+
+         _Callback?.Invoke(item);
+      }
+      private void ProcessIB(string[] del_felt)
+      {
+         var item = new SieIB
+         {
+            //Kontonr = del_felt[1],
+            //Namn = del_felt[2],
+         };
+
+         _Callback?.Invoke(item);
+      }
+      private void ProcessUB(string[] del_felt)
+      {
+         var item = new SieUB
+         {
+            //Kontonr = del_felt[1],
+            //Namn = del_felt[2],
+         };
+
+         _Callback?.Invoke(item);
+      }
+      private void ProcessRES(string[] del_felt)
+      {
+         var item = new SieRES
+         {
+            //Kontonr = del_felt[1],
+            //Namn = del_felt[2],
+         };
+
+         _Callback?.Invoke(item);
+      }
+      private void ProcessOUB(string[] del_felt)
+      {
+         var item = new SieOUB
+         {
+            //Kontonr = del_felt[1],
+            //Namn = del_felt[2],
+         };
+
+         _Callback?.Invoke(item);
+      }
+      private void ProcessOIB(string[] del_felt)
+      {
+         var item = new SieOIB
+         {
+            //Kontonr = del_felt[1],
+            //Namn = del_felt[2],
+         };
+
+         _Callback?.Invoke(item);
+      }
+      private void ProcessPSALDO(string[] del_felt)
+      {
+         var item = new SiePSALDO
+         {
+            //Kontonr = del_felt[1],
+            //Namn = del_felt[2],
+         };
+
+         _Callback?.Invoke(item);
+      }
+      private void ProcessPBUDGET(string[] del_felt)
+      {
+         var item = new SiePBUDGET
+         {
+            //Kontonr = del_felt[1],
+            //Namn = del_felt[2],
+         };
+
+         _Callback?.Invoke(item);
+      }
+      private void ProcessVER(string[] del_felt)
+      {
+         var item = new SieVER
+         {
+            //Kontonr = del_felt[1],
+            //Namn = del_felt[2],
+         };
+
+         _Callback?.Invoke(item);
+      }
       private void ProcessTRANS(string[] del_felt)
       {
+         var item = new SieTRANS
+         {
+            //Kontonr = del_felt[1],
+            //Namn = del_felt[2],
+         };
          //throw new NotImplementedException();
          var konto = del_felt[1];
          var belopp = decimal.Parse(del_felt[3], CultureInfo.InvariantCulture);
 
+         _Callback?.Invoke(item);
       }
+      private void ProcessRTRANS(string[] del_felt)
+      {
+         var item = new SieRTRANS
+         {
+            //Kontonr = del_felt[1],
+            //Namn = del_felt[2],
+         };
+
+         _Callback?.Invoke(item);
+      }
+      private void ProcessBTRANS(string[] del_felt)
+      {
+         var item = new SieBTRANS
+         {
+            //Kontonr = del_felt[1],
+            //Namn = del_felt[2],
+         };
+
+         _Callback?.Invoke(item);
+      }
+      private void ProcessKPTYP(string[] del_felt)
+      {
+         var item = new SieKPTYP
+         {
+            //Kontonr = del_felt[1],
+            //Namn = del_felt[2],
+         };
+
+         _Callback?.Invoke(item);
+      }
+      private void ProcessLEV(string[] del_felt)
+      {
+         var item = new SieLEV
+         {
+            //Kontonr = del_felt[1],
+            //Namn = del_felt[2],
+         };
+
+         _Callback?.Invoke(item);
+      }
+      private void ProcessLEVADR(string[] del_felt)
+      {
+         var item = new SieLEVADR
+         {
+            //Kontonr = del_felt[1],
+            //Namn = del_felt[2],
+         };
+
+         _Callback?.Invoke(item);
+      }
+      private void ProcessLEVBETINFO(string[] del_felt)
+      {
+         var item = new SieLEVBETINFO
+         {
+            //Kontonr = del_felt[1],
+            //Namn = del_felt[2],
+         };
+
+         _Callback?.Invoke(item);
+      }
+      private void ProcessLEVREF(string[] del_felt)
+      {
+         var item = new SieLEVREF
+         {
+            //Kontonr = del_felt[1],
+            //Namn = del_felt[2],
+         };
+
+         _Callback?.Invoke(item);
+      }
+      private void ProcessKUND(string[] del_felt)
+      {
+         var item = new SieKUND
+         {
+            //Kontonr = del_felt[1],
+            //Namn = del_felt[2],
+         };
+
+         _Callback?.Invoke(item);
+      }
+      private void ProcessKUNDADR(string[] del_felt)
+      {
+         var item = new SieKUNDADR
+         {
+            //Kontonr = del_felt[1],
+            //Namn = del_felt[2],
+         };
+
+         _Callback?.Invoke(item);
+      }
+      private void ProcessKUNDBETINFO(string[] del_felt)
+      {
+         var item = new SieKUNDBETINFO
+         {
+            //Kontonr = del_felt[1],
+            //Namn = del_felt[2],
+         };
+
+         _Callback?.Invoke(item);
+      }
+      private void ProcessKUNDREF(string[] del_felt)
+      {
+         var item = new SieKUNDREF
+         {
+            //Kontonr = del_felt[1],
+            //Namn = del_felt[2],
+         };
+
+         _Callback?.Invoke(item);
+      }
+       private void ProcessKSUMMA(string[] del_felt)
+      {
+         var item = new SieKSUMMA
+         {
+            //Kontonr = del_felt[1],
+            //Namn = del_felt[2],
+         };
+
+         _Callback?.Invoke(item);
+      }
+      private void ProcessVALUTA(string[] del_felt)
+      {
+         var item = new SieVALUTA
+         {
+            //Kontonr = del_felt[1],
+            //Namn = del_felt[2],
+         };
+
+         _Callback?.Invoke(item);
+      }
+
+
 
       void PostCheck()
       {
