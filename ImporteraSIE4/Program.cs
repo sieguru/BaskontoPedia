@@ -11,19 +11,14 @@ using Sie4Reader;
 
 namespace SieClient
 {
-
    class Program
    {
-
       // Programmet baserar sig på ett exempel från https://sieguru.se/2016/11/03/att-lasa-en-sie-fil/
       static void Main(string[] args)
       {
          var model = new BASContext(false);
-         //var sieMotor = new SieMotor();
-         //sieMotor.SetCallback_Konto(KontoCallback);
-
+ 
          Console.WriteLine("Working...");
- //        var text = File.ReadAllText(@"D:\BaskontoPedia\SIE4\transaktioner_ovnbolag.se", Encoding.GetEncoding(437));
 
 
          Reader.Read(model, @"D:\BaskontoPedia\SIE4\BL0001_typ4.SE");
@@ -43,14 +38,9 @@ namespace SieClient
          Reader.Read(model, @"D:\BaskontoPedia\SIE4\typ4 (1).se");
         // sieMotor.LesFil(@"D:\BaskontoPedia\SIE4\XE_SIE_4_20151125095119.SE", FELHANTERING.FORTSETT_VID_FEL);
 
-         //model.SaveChanges();
+         model.SaveChanges();
       }
-
-      //static void KontoCallback(string kontonr, string namn)
-      //{
-      //   Console.WriteLine("{0} {1}", kontonr, namn);
-      //}
-   }
+    }
 
    public class Reader
    {
@@ -78,6 +68,15 @@ namespace SieClient
          if (item.GetType() == typeof(SieKONTO))
          {
             var konto = (SieKONTO)item;
+
+            var acc = new UsedAccount
+            {
+               AccountID = konto.Kontonr,
+               Name = konto.Namn,
+            };
+
+            Model.UsedAccounts.Add(acc);
+
 
             Console.WriteLine("{0} {1}", konto.Kontonr, konto.Namn);
          }

@@ -77,6 +77,7 @@ namespace SieClient
          _Callback += del;
       }
 
+#if false
       static List<Posttyp> Posttyper = new List<Posttyp>{
          new Posttyp{},
          new Posttyp {Namn = "#FLAGGA",       Id = Id.S_FLAGGA,      Pattern = "N",        Oblig="OOOOO",  substart=false, subpost=false},
@@ -139,49 +140,40 @@ namespace SieClient
    new Posttyp {Namn = "#VALUTA",       Id = Id.S_VALUTA,      Pattern = "S",        Oblig="VVVVV",  substart=false, subpost=false},
 
 };
+#endif
       int Radnr;
       bool m_ver_flagga;
       bool m_klammer_aktiv;
 
-      //public virtual void Initiera()
+ 
+      //public SieMotor()
       //{
+      //   // Default constructor
+
+      //   //m_oemkonv = true;
+
+      //   //if (AfxGetApp()->GetProfileInt("AutoImport", "ANSI", 0))
+      //   //{
+      //   //   // Om man i registryt har angett att SIE-filerna innehåller ANSI
+      //   //   // så sätts ANSI som default
+
+      //   //   m_oemkonv = false;
+      //   //}
+
+
+      //   CImportfelBas m_felx = new CImportfelBas();
       //}
-
-      //public virtual void Avsluta()
-      //{
-      //}
-
-      public SieMotor()
-      {
-         // Default constructor
-
-         //m_oemkonv = true;
-
-         //if (AfxGetApp()->GetProfileInt("AutoImport", "ANSI", 0))
-         //{
-         //   // Om man i registryt har angett att SIE-filerna innehåller ANSI
-         //   // så sätts ANSI som default
-
-         //   m_oemkonv = false;
-         //}
-
-
-         CImportfelBas m_felx = new CImportfelBas();
-      }
 
       public void LesFil(string filnamn, FELHANTERING felhantering)
       {
          Radnr = 0;
          string line;
 
-         // Read the file and display it line by line.  
          using (StreamReader file = new StreamReader(filnamn, Encoding.GetEncoding(437)))
          {
-            //Initiera();
-
             while ((line = file.ReadLine()) != null)
             {
-               Radnr++;  /* Öka radräknaren. */
+               Radnr++;  
                line = line.Trim();
 
                if (line == "{")
@@ -194,15 +186,12 @@ namespace SieClient
                }
                else
                {
-                  //Console.WriteLine(line);
                   ProcessLine(line);
                }
             }
 
             file.Close();
-            //Avsluta();
          }
-
       }
 
 
@@ -464,8 +453,8 @@ namespace SieClient
          while (line.Length > 0)
          {
             Match matchQuotedString = regexQuotedString.Match(line); // "^\\s*([\"'])(?:(?=(\\\\?))\\2.)*?\\1"); 
-            Match matchCurlyBrackets = Regex.Match(line, "^\\s*\\{(.+)\\}");
-            Match matchLiteral = Regex.Match(line, "^\\s*([^\\s^\"]+)");
+            Match matchCurlyBrackets = regexCurlyBrackets.Match(line);
+            Match matchLiteral = regexLiteral.Match(line);
 
             if (matchQuotedString.Success)
             {
