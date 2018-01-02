@@ -3,52 +3,60 @@
 @{
     ViewBag.Title = "Huvudkonto";
 }
-<div class="container">
-    <div class="row">
+
+<div class="row">
+    <div class="col-md-10">
         @if (Model.Account != null)
         {
-        <h2>
-            @(Model.Account.AccountId)x @Model.Account.Name
-            @if (Model.Account.LastYear != "2017")
-            {
-            <strong>(Kontot saknas i BAS 2017) se @Model.Account.LastYear </strong>
-            }
-        </h2>
+            <h2>
+                @(Model.Account)
+                @if (Model.Account.LastYear != "2017")
+                {
+                    <strong>(Kontot saknas i BAS 2017) se @Model.Account.LastYear </strong>
+                }
+            </h2>
         }
         else
         {
             <h2>Kontot saknas i BAS 2017</h2>
         }
     </div>
+    <div class="col-md-2">
+        <h2 style="text-align:right;">
+            <span class="glyphicon glyphicon-chevron-left"></span>
+            <span class="glyphicon glyphicon-chevron-right"></span>
+        </h2>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <div class="e-line">
+        </div>
+    </div>
+
 </div>
 
-<div class="e-line">
-
-</div>
-
-<div class="container">
-    <div class="row">
 
 
-        <div class="row">
-            <div class="col-md-6">
-                <h4>Kontots innehåll</h4>
-                @if (!string.IsNullOrEmpty(Model.Account.SidaIBokforingsboken))
-    {
+<div class="row">
+    <div class="col-md-6">
+        <h4>Kontots innehåll</h4>
+        @if (!string.IsNullOrEmpty(Model.Account.SidaIBokforingsboken))
+        {
             <p>
                 Se Svensk Redovisning Bokföringssboken 2018, s. @Model.Account.SidaIBokforingsboken.
             </p>
-}
+        }
 
-                @if (!string.IsNullOrEmpty(Model.Account.SidaIBokslutsboken))
-    {
+        @if (!string.IsNullOrEmpty(Model.Account.SidaIBokslutsboken))
+        {
             <h4>Kontots innehåll</h4>
             <p>
                 Se Svensk Redovisning Bokslutsboken 2018, s. @Model.Account.SidaIBokslutsboken.
             </p>
-}
-                @if (Model.History != null)
-    {
+        }
+        @if (Model.History != null)
+        {
             <h4>Tidigare benämningar</h4>
             <table class="table">
                 <tr>
@@ -61,112 +69,117 @@
                 </tr>
 
                 @foreach (var item in Model.History)
-    {
-            <tr>
-                <td>
-                    @item.Years
-                </td>
-                <td>
-                    @item.Name
-                </td>
-            </tr>
-}
-            </table>
-}
-
-                <h4>Underkonton</h4>
-                <table class="table">
-                    <tr>
-                        <th>Kontonr</th>
-                        <th>Namn</th>
-                        <th>Kommentar</th>
-                    </tr>
-
-                    @foreach (var item in Model.Account.SubAccounts)
-        {
-            <tr>
-                <td>
-                    @Html.ActionLink(item.AccountId, "Huvudkonto/" + item.AccountId, "Home")
-                    @*@Html.DisplayFor(modelItem => item.AccountID)*@
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Name)
-                </td>
-                <td>Gruppkonto</td>
-            </tr>
-}
-
-                </table>
-
-
-                <h4 data-toggle="tooltip" title="Enligt användningsundersökning KA 18">Underkonton i praktisk användning</h4>
-                <table class="table">
-                    <tr>
-                        <th>Kontonr</th>
-                        <th>Namn</th>
-                        <th>Antal ftg</th>
-                    </tr>
-
-                    @foreach (var item in Model.UsedAccounts)
-        {
-            <tr>
-                <td>
-                    @item.AccountID
-                    @*@Html.DisplayFor(modelItem => item.AccountID)*@
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Name)
-                </td>
-            </tr>
-}
-
-                </table>
-            </div>
-            <div class="col-md-6">
-                <div class="panel panel-default">
-                    <div class="panel-heading">Företagsformer</div>
-                    <div class="panel-body">
-                        <ul>
-                            <li>Aktiebolag</li>
-                            <li>Enskild firma</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="panel panel-default">
-                    <div class="panel-heading">Placering i kontoplanen</div>
-                    <div class="panel-body">
-                        <p>@Model.Account.Parent.Parent.AccountId @Model.Account.Parent.Parent.Name</p>
-                        <p>&nbsp;&nbsp;@Html.ActionLink(Model.Account.Parent.AccountId + " " + Model.Account.Parent.Name, "Kontogrupp/" + Model.Account.Parent.AccountId, "Home")</p>
-                        @if (Model.Account != null)
-                        {
-                           @*<p>&nbsp;&nbsp;&nbsp;&nbsp;@Model.MainAccount.MainAccount @Model.MainAccount.MainAccount</p>*@
-                        }
-                    </div>
-                </div>
-
-                <div class="panel panel-default">
-                    <div class="panel-heading" data-toggle="tooltip" title="(INK2 2017 P3)">SRU-kod</div>
-                    <div class="panel-body">
-                        <p>TBD!</p>
-                    </div>
-                </div>
-
-                @if (Model.Account.XbrlElements.Count > 0)
                 {
-                <div class="panel panel-default">
-                    <div class="panel-heading" data-toggle="tooltip" title="(Enligt bolagsverkets taxonomi 2017-09-30)">Ingår i följande XBRL-element</div>
-                    <div class="panel-body">
-                        <div class="container-fluid">
-                            @foreach (var e in Model.Account.XbrlElements)
-                            {
+                    <tr>
+                        <td>
+                            @item.Years
+                        </td>
+                        <td>
+                            @item.Name
+                        </td>
+                    </tr>
+                }
+            </table>
+        }
+
+        <h4>Underkonton</h4>
+        <table class="table">
+            <tr>
+                <th>Kontonr</th>
+                <th>Namn</th>
+                <th>Kommentar</th>
+            </tr>
+
+            @foreach (var item in Model.Account.SubAccounts)
+            {
+                <tr>
+                    <td>
+                        @Html.ActionLink(item.AccountId, "Huvudkonto/" + item.AccountId, "Home")
+
+                        @if (item.Recommended)
+                        {
+                            <span>&nbsp;</span><span class="glyphicon glyphicon-stop"></span>
+                        }
+                        @*@Html.DisplayFor(modelItem => item.AccountID)*@
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Name)
+                    </td>
+                    <td>Gruppkonto</td>
+                </tr>
+            }
+
+        </table>
+
+
+        <h4 data-toggle="tooltip" title="Enligt användningsundersökning KA 18">Underkonton i praktisk användning</h4>
+        <table class="table">
+            <tr>
+                <th>Kontonr</th>
+                <th>Namn</th>
+                <th>Antal ftg</th>
+            </tr>
+
+            @foreach (var item in Model.UsedAccounts)
+            {
+                <tr>
+                    <td>
+                        @item.AccountID
+                        @*@Html.DisplayFor(modelItem => item.AccountID)*@
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Name)
+                    </td>
+                </tr>
+            }
+
+        </table>
+    </div>
+    <div class="col-md-6">
+        <div class="panel panel-default">
+            <div class="panel-heading">Företagsformer</div>
+            <div class="panel-body">
+                <ul>
+                    <li>Aktiebolag</li>
+                    <li>Enskild firma</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="panel panel-default">
+            <div class="panel-heading">Placering i kontoplanen</div>
+            <div class="panel-body">
+                <p>@Model.Account.Parent.Parent.AccountId @Model.Account.Parent.Parent.Name</p>
+                <p>&nbsp;&nbsp;@Html.ActionLink(Model.Account.Parent.AccountId + " " + Model.Account.Parent.Name, "Kontogrupp/" + Model.Account.Parent.AccountId, "Home")</p>
+                @if (Model.Account != null)
+                {
+                    @*<p>&nbsp;&nbsp;&nbsp;&nbsp;@Model.MainAccount.MainAccount @Model.MainAccount.MainAccount</p>*@
+                }
+            </div>
+        </div>
+
+        <div class="panel panel-default">
+            <div class="panel-heading" data-toggle="tooltip" title="(INK2 2017 P3)">SRU-kod</div>
+            <div class="panel-body">
+                <p>TBD!</p>
+            </div>
+        </div>
+
+        @if (Model.Account.XbrlElements.Count > 0)
+        {
+            <div class="panel panel-default">
+                <div class="panel-heading" data-toggle="tooltip" title="(Enligt bolagsverkets taxonomi 2017-09-30)">Ingår i följande XBRL-element</div>
+                <div class="panel-body">
+                    <div class="container-fluid">
+                        @foreach (var e in Model.Account.XbrlElements)
+                        {
                             <div class="row">
                                 <div class="col-md-6">
                                     <h5><strong>Elementnamn</strong></h5>
                                     <p>@Html.ActionLink(e.ElementName, "Xbrl/" + e.ElementName, "Home")</p>
-                                            <h5><strong>Rubriktext</strong></h5>
-                                            <p>@(e.Name)</p>
-</div>
+                                    <h5><strong>Rubriktext</strong></h5>
+                                    <p>@(e.Name)</p>
+                                </div>
                                 <div class="col-md-6">
                                     <h5><strong>Placering</strong></h5>
                                     <p>@(e.Header1)</p>
@@ -176,37 +189,34 @@
                                 </div>
 
                             </div>
-                            }
+                        }
 
-                            </div>
                     </div>
                 </div>
-                }
+            </div>
+        }
 
-                <div class="panel panel-default">
-                    <div class="panel-heading">Användning (KA 18) (för relevanta företagsformer)</div>
-                    <div class="panel-body">
-                        <table class="table">
-                            <tr>
-                                <th>Förekomst</th>
-                                <th>Användn</th>
-                                <th>Användn D</th>
-                                <th>Användn K</th>
-                            </tr>
-                        </table>
-                        <p>TBD!</p>
-                    </div>
-                </div>
-
-                <div class="panel panel-default">
-                    <div class="panel-heading">Alternativ benämning (KA 18)</div>
-                    <div class="panel-body">
-                        <p>TBD!</p>
-                    </div>
-                </div>
-
+        <div class="panel panel-default">
+            <div class="panel-heading">Användning (KA 18) (för relevanta företagsformer)</div>
+            <div class="panel-body">
+                <table class="table">
+                    <tr>
+                        <th>Förekomst</th>
+                        <th>Användn</th>
+                        <th>Användn D</th>
+                        <th>Användn K</th>
+                    </tr>
+                </table>
+                <p>TBD!</p>
             </div>
         </div>
-    </div>
 
+        <div class="panel panel-default">
+            <div class="panel-heading">Alternativ benämning (KA 18)</div>
+            <div class="panel-body">
+                <p>TBD!</p>
+            </div>
+        </div>
+
+    </div>
 </div>

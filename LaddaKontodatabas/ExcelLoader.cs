@@ -52,7 +52,20 @@ namespace JournalMatcher
          {
             string note = GetStringValue(sheet, row, 2);
             string kontonr = GetStringValue(sheet, row, 3).Trim();
+            kontonr = kontonr.Replace("\n", ""); 
+
+
             string kontonamn = GetStringValue(sheet, row, 4).Trim();
+
+            var parts = kontonr.Split(new[] { ' ' });
+
+            if (parts.Count() > 1)
+            {
+               kontonr = parts[0];
+               kontonamn = parts[1];
+            }
+
+            kontonr = kontonr.Replace((char)8211, '-');  // Typografiskt bindestreck ersätts med normalt
 
 
             if (!string.IsNullOrWhiteSpace(kontonr))
@@ -82,16 +95,30 @@ namespace JournalMatcher
                   // Huvudkonto
                   huvudkonto = kontonr.Substring(0, 3);
 
-                  AddAccount(model, year, kontonr.Substring(0, 3), kontonamn, huvudkonto, false, false);
+                  AddAccount(model, year, kontonr.Substring(0, 3), null, kontonamn, huvudkonto, false, false);
                   // Underkonto (nollkonto)
-                  AddAccount(model, year, kontonr, kontonamn, huvudkonto, false, false);
+                  AddAccount(model, year, kontonr, null, kontonamn, huvudkonto, false, false);
                }
                else
                {
                   // Kontoklass eller kontogrupp
-                  huvudkonto = kontonr;
 
-                  AddAccount(model, year, kontonr, kontonamn, huvudkonto, false, false);
+                  if (kontonr.Contains('-'))  
+                  {
+                     var intervalParts = kontonr.Split(new[] { '-' });
+                     kontonr = intervalParts[0];
+                     string slutkonto= intervalParts[1];
+                     huvudkonto = kontonr;
+
+                     AddAccountInterval(model, year, kontonr, slutkonto, kontonamn, huvudkonto);
+                  }
+                  else
+                  {
+
+                     huvudkonto = kontonr;
+
+                     AddAccount(model, year, kontonr, null, kontonamn, huvudkonto, false, false);
+                  }
                }
             }
 
@@ -114,7 +141,7 @@ namespace JournalMatcher
             if (!string.IsNullOrWhiteSpace(kontonr))
             {
                //Underkonto
-               AddAccount(model, year, kontonr, kontonamn, huvudkonto, notK2, recommended);
+               AddAccount(model, year, kontonr, null, kontonamn, huvudkonto, notK2, recommended);
             }
 
 
@@ -123,14 +150,29 @@ namespace JournalMatcher
 
       }
 
-      private void AddAccount(BASContext model, string year, string kontonr, string kontonamn, string huvudkonto, bool notK2, bool recommended)
+      private void AddAccountInterval(BASContext model, string year, string kontonr, string slutkonto, string kontonamn, string huvudkonto)
+      {
+         string reference = kontonr;
+         AddAccount(model, year, kontonr, slutkonto, kontonamn, huvudkonto, false, false);
+
+         while (kontonr != slutkonto)
+         {
+            // Öka sistasiffran
+
+            kontonr = kontonr.Substring(0, kontonr.Length - 1) + (char)(kontonr[kontonr.Length - 1] + 1);
+            AddAccount(model, year, kontonr, null, kontonamn, huvudkonto, false, false, reference);
+         }
+      }
+
+      private void AddAccount(BASContext model, string year, string kontonr, string intervallslut, string kontonamn, string huvudkonto, bool notK2, bool recommended, string reference = null)
       {
          kontonr = kontonr.Trim();
          kontonamn = kontonamn.Trim();
 
          if (!Regex.IsMatch(kontonr, @"^[1-8][0-9]{0,3}$"))
          {
-            Console.WriteLine("Ogiltigt konto {0} - {1}", kontonr, kontonamn);
+            //Console.WriteLine("Ogiltigt konto {0} - {1}", kontonr, kontonamn);
+            return;
          }
 
          //Console.WriteLine("{0} - {1}", kontonr, kontonamn);
@@ -153,6 +195,8 @@ namespace JournalMatcher
                AccountId = kontonr,
                Name = kontonamn,
                LastYear = year,
+               IntervalEnd = intervallslut,
+               IntervalReference = reference
             };
 
             //accno.Accounts = new List<Account>();
@@ -161,19 +205,26 @@ namespace JournalMatcher
 
             allAccounts.Add(kontonr, accno);
 
-            // Lägg till under "parent"
-
-            string parentNr = kontonr.Substring(0, kontonr.Length - 1);
-
-            if (!allAccounts.ContainsKey(parentNr))
+            if (kontonr.Length > 1)
             {
-               Console.WriteLine("Parent saknas för {0} - {1}", kontonr, kontonamn);
-            }
-            else
-            {
-               var parent = allAccounts[parentNr];
-               accno.Parent = parent;
-               parent.SubAccounts.Add(accno);
+               // Lägg till under "parent"
+
+               string parentNr = kontonr.Substring(0, kontonr.Length - 1);
+
+               if (!allAccounts.ContainsKey(parentNr))
+               {
+                  Console.WriteLine("Parent saknas för {0} - {1}", kontonr, kontonamn);
+               }
+               else
+               {
+                  var parent = allAccounts[parentNr];
+                  if (parent.IntervalReference != null)
+                  {
+                     parent = allAccounts[parent.IntervalReference];
+                  }
+                  accno.Parent = parent;
+                  parent.SubAccounts.Add(accno);
+               }
             }
          }
          else
@@ -279,15 +330,15 @@ namespace JournalMatcher
                         // Huvudkonto
                         huvudkonto = kontonr.Substring(0, 3);
 
-                        AddAccount(model, year, kontonr.Substring(0, 3), kontonamn, huvudkonto, false, false);
-                        AddAccount(model, year, kontonr, kontonamn, huvudkonto, false, false);
+                        AddAccount(model, year, kontonr.Substring(0, 3), null, kontonamn, huvudkonto, false, false);
+                        AddAccount(model, year, kontonr, null, kontonamn, huvudkonto, false, false);
                      }
                      else
                      {
                         // Kontoklass eller kontogrupp
                         huvudkonto = kontonr;
 
-                        AddAccount(model, year, kontonr, kontonamn, huvudkonto, false, false);
+                        AddAccount(model, year, kontonr, null, kontonamn, huvudkonto, false, false);
                      }
 
                   }
@@ -301,7 +352,7 @@ namespace JournalMatcher
                   if (!string.IsNullOrWhiteSpace(kontonr))
                   {
                      // Underkonto
-                     AddAccount(model, year, kontonr, kontonamn, huvudkonto, false, false);
+                     AddAccount(model, year, kontonr, null, kontonamn, huvudkonto, false, false);
                   }
                }
             }
@@ -330,22 +381,22 @@ namespace JournalMatcher
                      // Huvudkonto
                      huvudkonto = kontonr.Substring(0, 3);
 
-                     AddAccount(model, year, kontonr.Substring(0, 3), kontonamn, huvudkonto, false, false);
-                     AddAccount(model, year, kontonr, kontonamn, huvudkonto, false, false);
+                     AddAccount(model, year, kontonr.Substring(0, 3), null, kontonamn, huvudkonto, false, false);
+                     AddAccount(model, year, kontonr, null, kontonamn, huvudkonto, false, false);
                   }
                   else
                   {
                      // Kontoklass eller kontogrupp
                      huvudkonto = kontonr;
 
-                     AddAccount(model, year, kontonr, kontonamn, huvudkonto, false, false);
+                     AddAccount(model, year, kontonr, null, kontonamn, huvudkonto, false, false);
                   }
 
                }
                else
                {
 
-                  AddAccount(model, year, kontonr, kontonamn, huvudkonto, false, false);
+                  AddAccount(model, year, kontonr, null, kontonamn, huvudkonto, false, false);
                }
 
                return huvudkonto;

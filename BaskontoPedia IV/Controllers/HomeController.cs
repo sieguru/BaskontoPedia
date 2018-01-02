@@ -54,13 +54,13 @@ namespace BaskontoPedia_IV.Controllers
       //public Account MainAccount { get; set; }
 
       //public IEnumerable<Account> HistoricAccounts { get; set; }
-      public Account[] Classes { get; set; }
-      public Account[,] Accounts { get; set; }
+      public AccountNumber[] Classes { get; set; }
+      public AccountNumber[,] Accounts { get; set; }
       //public IEnumerable<Account> UsedAccounts { get; set; }
       public AccountPlanViewModel()
       {
-         Classes = new Account[10];
-         Accounts = new Account[10,10];
+         Classes = new AccountNumber[10];
+         Accounts = new AccountNumber[10,10];
       }
 
    }
@@ -77,23 +77,22 @@ namespace BaskontoPedia_IV.Controllers
       {
          var kontoPlanVM = new AccountPlanViewModel();
 
-         var konton  = from k in model.Accounts
-                       where k.Year == "2017"
+         var konton  = from k in model.AccountNumbers
                        select k;
 
          foreach (var k in konton)
          {
-            if (k.AccountID.Length == 1)
+            if (k.AccountId.Length == 1)
             {
-               int col = int.Parse(k.AccountID.Substring(0, 1));
+               int col = int.Parse(k.AccountId.Substring(0, 1));
 
                kontoPlanVM.Classes[col] = k;
             }
 
-            if (k.AccountID.Length == 2)
+            if (k.AccountId.Length == 2)
             {
-               int col = int.Parse(k.AccountID.Substring(0, 1));
-               int row = int.Parse(k.AccountID.Substring(1, 1));
+               int col = int.Parse(k.AccountId.Substring(0, 1));
+               int row = int.Parse(k.AccountId.Substring(1, 1));
 
                kontoPlanVM.Accounts[row, col] = k;
             }
@@ -113,9 +112,17 @@ namespace BaskontoPedia_IV.Controllers
                                 where k.AccountId == id
                                 select k).FirstOrDefault();
 
- 
+         if (kontoVM.Account.IntervalReference != null)
+         {
+            // Vi har träffat mitt i ett intervall - Gå till starten på intervallet
+            kontoVM.Account = (from k in model.AccountNumbers
+                               where k.AccountId == kontoVM.Account.IntervalReference
+                               select k).FirstOrDefault();
+         }
+
+
          var histKonton = from k in model.Accounts
-                          where k.AccountID == id
+                          where k.AccountID == kontoVM.Account.AccountId
                           orderby k.Year
                           select k;
 
@@ -190,7 +197,15 @@ namespace BaskontoPedia_IV.Controllers
          kontoGruppVM.Group = (from k in model.AccountNumbers
                                where k.AccountId == id
                                select k).FirstOrDefault();
-   
+
+         if (kontoGruppVM.Group.IntervalReference != null)
+         {
+            // Vi har träffat mitt i ett intervall - Gå till starten på intervallet
+            kontoGruppVM.Group = (from k in model.AccountNumbers
+                               where k.AccountId == kontoGruppVM.Group.IntervalReference
+                               select k).FirstOrDefault();
+         }
+
          return View(kontoGruppVM);
       }
       public ActionResult Xbrl(string id)

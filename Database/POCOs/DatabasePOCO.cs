@@ -10,56 +10,56 @@ using System.Threading.Tasks;
 
 namespace SQLDatabase
 {
-   public class AccountNumber
-   {
-      public AccountNumber()
-      {
-         this.XbrlElements = new HashSet<XBRLElement>();
-         this.Accounts = new HashSet<Account>();
-         this.SubAccounts = new HashSet<AccountNumber>();
-         this.Sokord = new HashSet<Sokord>();
-      }
+   //public class AccountNumber
+   //{
+   //   public AccountNumber()
+   //   {
+   //      this.XbrlElements = new HashSet<XBRLElement>();
+   //      this.Accounts = new HashSet<Account>();
+   //      this.SubAccounts = new HashSet<AccountNumber>();
+   //      this.Sokord = new HashSet<Sokord>();
+   //   }
 
-      [Key]
-      public string AccountId { get; set; }
-      public string Name { get; set; }
-      public string LastYear { get; set; }
-      public string SidaIBokforingsboken { get; set; }
-      public string SidaIBokslutsboken { get; set; }
+   //   [Key]
+   //   public string AccountId { get; set; }
+   //   public string Name { get; set; }
+   //   public string LastYear { get; set; }
+   //   public string SidaIBokforingsboken { get; set; }
+   //   public string SidaIBokslutsboken { get; set; }
 
-      public virtual ICollection<Account> Accounts { get; set; }    // BAS-konton som ingår under detta kontonummer:
-      public virtual ICollection<XBRLElement> XbrlElements { get; set; }    // XBRL-element som omfattar detta kontonummer:
-      public virtual ICollection<Sokord> Sokord { get; set; }    // Sökord som omfattar detta BAS-konto:
+   //   public virtual ICollection<Account> Accounts { get; set; }    // BAS-konton som ingår under detta kontonummer:
+   //   public virtual ICollection<XBRLElement> XbrlElements { get; set; }    // XBRL-element som omfattar detta kontonummer:
+   //   public virtual ICollection<Sokord> Sokord { get; set; }    // Sökord som omfattar detta BAS-konto:
 
-      public virtual string ParentId { get; set; }  // Self-reference
-      [ForeignKey("ParentId")]
-      public virtual ICollection<AccountNumber> SubAccounts { get; set; }    // BAS-konton som ingår under detta XBRL-element:
-      public virtual AccountNumber Parent { get; set; }    // BAS-konton som ingår under detta XBRL-element:
-   }
+   //   public virtual string ParentId { get; set; }  // Self-reference
+   //   [ForeignKey("ParentId")]
+   //   public virtual ICollection<AccountNumber> SubAccounts { get; set; }    // BAS-konton som ingår under detta XBRL-element:
+   //   public virtual AccountNumber Parent { get; set; }    // BAS-konton som ingår under detta XBRL-element:
+   //}
 
-   public class Account
-   {
-      public int Id { get; set; }
+   //public class Account
+   //{
+   //   public int Id { get; set; }
 
-      public string AccountID { get; set; }
-      public string Year { get; set; }
-      public string Name { get; set; }
-      public string Comment { get; set; }
+   //   public string AccountID { get; set; }
+   //   public string Year { get; set; }
+   //   public string Name { get; set; }
+   //   public string Comment { get; set; }
 
-      public bool NotK2 { get; set; }
-      public bool Recommended { get; set; }
+   //   public bool NotK2 { get; set; }
+   //   public bool Recommended { get; set; }
 
-      public bool SubAccount { get; set; }
+   //   public bool SubAccount { get; set; }
 
-      public string MainAccount { get; set; }
+   //   public string MainAccount { get; set; }
 
-      [ForeignKey("AccountNumberKey")]
-      public virtual AccountNumber Number { get; set; }
+   //   [ForeignKey("AccountNumberKey")]
+   //   public virtual AccountNumber Number { get; set; }
 
-      public string AccountNumberKey { get; set; }
+   //   public string AccountNumberKey { get; set; }
 
-      //public virtual ICollection<XBRLElement> XbrlElements { get; set; }    // XBRL-element som omfattar detta BAS-konto:
-   }
+   //   //public virtual ICollection<XBRLElement> XbrlElements { get; set; }    // XBRL-element som omfattar detta BAS-konto:
+   //}
 
    public class UsedAccount
    {

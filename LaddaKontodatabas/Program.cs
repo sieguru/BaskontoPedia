@@ -18,7 +18,7 @@ namespace ConsoleApp1
 
          var model = new BASContext(true);
          var loader = new ExcelLoader(errors);
-         loader.Load2000(model, "2000", @"D:\BaskontoPedia\BAS 2000.xlsx");
+         //loader.Load2000(model, "2000", @"D:\BaskontoPedia\BAS 2000.xlsx");
          //loader.Load2005(model, "2005", @"D:\BaskontoPedia\BAS-2005-kontotabell.xls");
          //loader.Load2005(model, "2006", @"D:\BaskontoPedia\BAS-2006-kontotabell.xls");
          //loader.Load2005(model, "2007", @"D:\BaskontoPedia\BAS-2007-kontotabell.xls");

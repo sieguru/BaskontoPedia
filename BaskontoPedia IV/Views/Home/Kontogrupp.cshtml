@@ -4,7 +4,7 @@
     ViewBag.Title = "Kontogrupp";
 }
 
-<h2>Kontogrupp @Model.Group.AccountId @Model.Group.Name </h2>
+<h2>Kontogrupp @Model.Group</h2>
 
 
 <table class="table">
@@ -20,7 +20,7 @@
     {
     <tr>
         <td>
-            @Html.ActionLink(item.AccountId + "x", "Huvudkonto/" + item.AccountId, "Home")
+            @Html.ActionLink(item.Number, "Huvudkonto/" + item.AccountId, "Home")
 
         </td>
         <td>
