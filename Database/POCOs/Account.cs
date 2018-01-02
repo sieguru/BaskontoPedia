@@ -23,9 +23,7 @@ namespace SQLDatabase
       public bool NotK2 { get; set; }
       public bool Recommended { get; set; }
 
-      public bool SubAccount { get; set; }
-
-      public string MainAccount { get; set; }
+ //     public bool SubAccount { get; set; } // Todo: Möjlighet att skilja på olika (under)kontotyper
 
       [ForeignKey("AccountNumberKey")]
       public virtual AccountNumber Number { get; set; }

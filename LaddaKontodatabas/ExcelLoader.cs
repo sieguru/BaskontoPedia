@@ -33,28 +33,21 @@ namespace JournalMatcher
 
       public void Load(BASContext model, string year, string filnamn)
       {
+         Console.WriteLine("Laddar BAS {0}", year);
          wb = xl.Workbooks.Open(filnamn, 0, true, 6, "", "", true, Microsoft.Office.Interop.Excel.XlPlatform.xlWindows, ";", false, false, 0, true, 1, 0);
 
          Excel.Worksheet sheet = wb.Worksheets.get_Item(1);
-
-
-         //string name = sheet.Name;
-         //Console.WriteLine("Laddar blad {0}", name);
 
 
          var columns = sheet.Columns.Count;
 
          var rows = sheet.Rows.Count;
 
-         string huvudkonto = "";
-
          for (int row = 6; row < rows; row++)
          {
             string note = GetStringValue(sheet, row, 2);
             string kontonr = GetStringValue(sheet, row, 3).Trim();
-            kontonr = kontonr.Replace("\n", ""); 
-
-
+            kontonr = kontonr.Replace("\n", "");
             string kontonamn = GetStringValue(sheet, row, 4).Trim();
 
             var parts = kontonr.Split(new[] { ' ' });
@@ -66,13 +59,7 @@ namespace JournalMatcher
             }
 
             kontonr = kontonr.Replace((char)8211, '-');  // Typografiskt bindestreck ersätts med normalt
-
-
-            if (!string.IsNullOrWhiteSpace(kontonr))
-            {
-               huvudkonto = kontonr;
-            }
-
+  
             bool notK2 = false;
             bool recommended = false;
 
@@ -90,35 +77,25 @@ namespace JournalMatcher
             {
                if (kontonr == "END") return;
 
-               if ((kontonr.Length == 4) && (kontonr.Substring(3, 1) == "0"))
+               if (kontonr.Contains('-'))
                {
-                  // Huvudkonto
-                  huvudkonto = kontonr.Substring(0, 3);
+                  var intervalParts = kontonr.Split(new[] { '-' });
+                  kontonr = intervalParts[0];
+                  string slutkonto = intervalParts[1];
+                  //Console.WriteLine("Adding interval: {0}-{1}", kontonr, slutkonto);
 
-                  AddAccount(model, year, kontonr.Substring(0, 3), null, kontonamn, huvudkonto, false, false);
-                  // Underkonto (nollkonto)
-                  AddAccount(model, year, kontonr, null, kontonamn, huvudkonto, false, false);
-               }
-               else
-               {
-                  // Kontoklass eller kontogrupp
-
-                  if (kontonr.Contains('-'))  
+                  if (!slutkonto.StartsWith(kontonr.Substring(0, kontonr.Length - 1)))
                   {
-                     var intervalParts = kontonr.Split(new[] { '-' });
-                     kontonr = intervalParts[0];
-                     string slutkonto= intervalParts[1];
-                     huvudkonto = kontonr;
-
-                     AddAccountInterval(model, year, kontonr, slutkonto, kontonamn, huvudkonto);
+                     Console.WriteLine("Ogiltigt intervall: {0}-{1}", kontonr, slutkonto);
                   }
                   else
                   {
-
-                     huvudkonto = kontonr;
-
-                     AddAccount(model, year, kontonr, null, kontonamn, huvudkonto, false, false);
+                     AddAccountInterval(model, year, kontonr, slutkonto, kontonamn, true, notK2, recommended);
                   }
+               }
+               else
+               {
+                  AddAccount(model, year, kontonr, null, kontonamn, true, notK2, recommended);
                }
             }
 
@@ -141,30 +118,26 @@ namespace JournalMatcher
             if (!string.IsNullOrWhiteSpace(kontonr))
             {
                //Underkonto
-               AddAccount(model, year, kontonr, null, kontonamn, huvudkonto, notK2, recommended);
+               AddAccount(model, year, kontonr, null, kontonamn, false, notK2, recommended);
             }
-
-
          }
-         //Console.WriteLine("Laddat {0} transar från bankkontot.", bin.Count);
-
       }
 
-      private void AddAccountInterval(BASContext model, string year, string kontonr, string slutkonto, string kontonamn, string huvudkonto)
+      private void AddAccountInterval(BASContext model, string year, string kontonr, string slutkonto, string kontonamn, bool firstcol, bool notK2, bool recommended)
       {
          string reference = kontonr;
-         AddAccount(model, year, kontonr, slutkonto, kontonamn, huvudkonto, false, false);
+         AddAccount(model, year, kontonr, slutkonto, kontonamn, firstcol, notK2, recommended);
 
          while (kontonr != slutkonto)
          {
             // Öka sistasiffran
 
             kontonr = kontonr.Substring(0, kontonr.Length - 1) + (char)(kontonr[kontonr.Length - 1] + 1);
-            AddAccount(model, year, kontonr, null, kontonamn, huvudkonto, false, false, reference);
+            AddAccount(model, year, kontonr, null, kontonamn, firstcol, notK2, recommended, reference);
          }
       }
 
-      private void AddAccount(BASContext model, string year, string kontonr, string intervallslut, string kontonamn, string huvudkonto, bool notK2, bool recommended, string reference = null)
+      private void AddAccount(BASContext model, string year, string kontonr, string intervallslut, string kontonamn, bool firstcol, bool notK2, bool recommended, string reference = null)
       {
          kontonr = kontonr.Trim();
          kontonamn = kontonamn.Trim();
@@ -175,6 +148,15 @@ namespace JournalMatcher
             return;
          }
 
+         if ((firstcol == true) && (kontonr.Length == 4) && (kontonr.Substring(3, 1) == "0"))
+         {
+            // Ett huvudkonto i första kolumnen ska läggas upp både som ett huvudkonto och som ett underkonto
+            // Lägg upp huvudkontot genom rekursion
+
+            AddAccount(model, year, kontonr.Substring(0, 3), null, kontonamn, false, notK2, recommended);
+         }
+
+
          //Console.WriteLine("{0} - {1}", kontonr, kontonamn);
          var acc = new Account
          {
@@ -183,10 +165,18 @@ namespace JournalMatcher
             Name = kontonamn,
             NotK2 = notK2,
             Recommended = recommended,
-            SubAccount = (kontonr.Length == 4),
-            MainAccount = huvudkonto,
          };
          model.Accounts.Add(acc);
+
+         AddToAccountNumber(year, kontonr, intervallslut, kontonamn, recommended, reference, acc);
+      }
+
+      private void AddToAccountNumber(string year, string kontonr, string intervallslut, string kontonamn, bool recommended, string reference, Account acc)
+      {
+         if ((kontonr.Length < 4) && (year != "2017"))
+         {
+            // Hummer för klasser, grupper och huvudkonton lägger vi bara upp om de avser aktuellt år
+         }
 
          if (!allAccounts.ContainsKey(kontonr))
          {
@@ -196,12 +186,13 @@ namespace JournalMatcher
                Name = kontonamn,
                LastYear = year,
                IntervalEnd = intervallslut,
+               Recommended = recommended,
                IntervalReference = reference
             };
 
             //accno.Accounts = new List<Account>();
             accno.Accounts.Add(acc);
-//            model.AccountNumbers.Add(accno);
+            //            model.AccountNumbers.Add(accno);
 
             allAccounts.Add(kontonr, accno);
 
@@ -238,56 +229,39 @@ namespace JournalMatcher
 
                accno.LastYear = year;
                accno.Name = kontonamn;
-           }
+            }
          }
-
       }
 
       public void Load2000(BASContext model, string year, string filnamn)
       {
+         Console.WriteLine("Laddar BAS {0}", year);
          wb = xl.Workbooks.Open(filnamn, 0, true, 6, "", "", true, Microsoft.Office.Interop.Excel.XlPlatform.xlWindows, ";", false, false, 0, true, 1, 0);
 
          Excel.Worksheet sheet = wb.Worksheets.get_Item(1);
 
-
-         //string name = sheet.Name;
-         //Console.WriteLine("Laddar blad {0}", name);
-
-
          var columns = sheet.Columns.Count;
 
          var rows = sheet.Rows.Count;
-
 
          for (int row = 2; row < rows; row++)
          {
             string text = GetStringValue(sheet, row, 1);
             if (text == "END") return;
 
-            string huvudkonto = "";
+            SplitAccount(model, year, text, true);
 
-            string kontonr = SplitAccount(model, year, text);
-            if (!string.IsNullOrWhiteSpace(kontonr))
-            {
-               huvudkonto = kontonr;
-            }
-               text = GetStringValue(sheet, row, 2);
-            SplitAccount(model, year, text, huvudkonto);
-
+            text = GetStringValue(sheet, row, 2);
+            SplitAccount(model, year, text, false);
          }
-
       }
 
       public void Load2005(BASContext model, string year, string filnamn)
       {
+         Console.WriteLine("Laddar BAS {0}", year);
          wb = xl.Workbooks.Open(filnamn, 0, true, 6, "", "", true, Microsoft.Office.Interop.Excel.XlPlatform.xlWindows, ";", false, false, 0, true, 1, 0);
 
          Excel.Worksheet sheet = wb.Worksheets.get_Item(1);
-
-
-         //string name = sheet.Name;
-         //Console.WriteLine("Laddar blad {0}", name);
-
 
          var columns = sheet.Columns.Count;
 
@@ -300,8 +274,6 @@ namespace JournalMatcher
             text = text.Trim();
 
             if (text == "END") return;
-            
-            string huvudkonto = "";
 
             if (text == "BAS-konton")
             {
@@ -311,11 +283,7 @@ namespace JournalMatcher
             {
                if (text.Contains(" "))
                {
-                  string kontonr = SplitAccount(model, year, text);
-                  if (!string.IsNullOrWhiteSpace(kontonr))
-                  {
-                     huvudkonto = kontonr;
-                  }
+                  SplitAccount(model, year, text, true);
                }
                else
                {
@@ -325,22 +293,7 @@ namespace JournalMatcher
 
                   if (!string.IsNullOrWhiteSpace(kontonr))
                   {
-                     if ((kontonr.Length == 4) && (kontonr.Substring(3, 1) == "0"))
-                     {
-                        // Huvudkonto
-                        huvudkonto = kontonr.Substring(0, 3);
-
-                        AddAccount(model, year, kontonr.Substring(0, 3), null, kontonamn, huvudkonto, false, false);
-                        AddAccount(model, year, kontonr, null, kontonamn, huvudkonto, false, false);
-                     }
-                     else
-                     {
-                        // Kontoklass eller kontogrupp
-                        huvudkonto = kontonr;
-
-                        AddAccount(model, year, kontonr, null, kontonamn, huvudkonto, false, false);
-                     }
-
+                     AddAccount(model, year, kontonr, null, kontonamn, true, false, false);
                   }
 
                }
@@ -352,7 +305,7 @@ namespace JournalMatcher
                   if (!string.IsNullOrWhiteSpace(kontonr))
                   {
                      // Underkonto
-                     AddAccount(model, year, kontonr, null, kontonamn, huvudkonto, false, false);
+                     AddAccount(model, year, kontonr, null, kontonamn, false, false, false);
                   }
                }
             }
@@ -361,7 +314,7 @@ namespace JournalMatcher
       }
 
 
-      private string SplitAccount(BASContext model, string year, string text, string huvudkonto = null)
+      private void SplitAccount(BASContext model, string year, string text, bool firstcol)
       {
          if (!string.IsNullOrWhiteSpace(text))
          {
@@ -372,44 +325,16 @@ namespace JournalMatcher
                // Numeriskt kontonummer - OK
                string kontonr = part1.Trim();
                string kontonamn = text.Substring(part1.Length).Trim();
-               Console.WriteLine("{0} - {1}", kontonr, kontonamn);
+               //Console.WriteLine("{0} - {1}", kontonr, kontonamn);
 
-               if (huvudkonto == null) // Från vänsterspalten
-               {
-                  if ((kontonr.Length == 4) && (kontonr.Substring(3, 1) == "0"))
-                  {
-                     // Huvudkonto
-                     huvudkonto = kontonr.Substring(0, 3);
-
-                     AddAccount(model, year, kontonr.Substring(0, 3), null, kontonamn, huvudkonto, false, false);
-                     AddAccount(model, year, kontonr, null, kontonamn, huvudkonto, false, false);
-                  }
-                  else
-                  {
-                     // Kontoklass eller kontogrupp
-                     huvudkonto = kontonr;
-
-                     AddAccount(model, year, kontonr, null, kontonamn, huvudkonto, false, false);
-                  }
-
-               }
-               else
-               {
-
-                  AddAccount(model, year, kontonr, null, kontonamn, huvudkonto, false, false);
-               }
-
-               return huvudkonto;
+               AddAccount(model, year, kontonr, null, kontonamn, firstcol, false, false);
             }
             else
             {
                // Icke-numeriskt
-               Console.WriteLine("Error: {0}", text);
-               return "";
+              // Console.WriteLine("Error: {0}", text);
             }
          }
-
-         return "";
       }
 
       public string CellName(int row, int col)

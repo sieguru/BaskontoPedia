@@ -17,6 +17,7 @@ namespace BaskontoPedia_IV.Controllers
 
    public class AccountViewModel
    {
+      public string  CurrentYear { get; set; }
       public AccountNumber Account { get; set; }
 
       //public IEnumerable<Account> HistoricAccounts { get; set; }
@@ -105,7 +106,10 @@ namespace BaskontoPedia_IV.Controllers
       {
          ViewBag.Message = "Huvudkonto.";
 
-         var kontoVM = new AccountViewModel();
+         var kontoVM = new AccountViewModel
+         {
+            CurrentYear = "2017",
+         };
 
 
          kontoVM.Account = (from k in model.AccountNumbers

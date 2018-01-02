@@ -19,10 +19,10 @@ namespace PDFReader
       static void Main(string[] args)
       {
          StringBuilder text = new StringBuilder();
-         PdfDocument pdfDoc = new PdfDocument(new PdfReader(@"D:\BaskontoPedia\Bokforingsboken manus den 23 oktober 2017.pdf"));
+         PdfDocument pdfDoc = new PdfDocument(new PdfReader(@"D:\BaskontoPedia\Bokforingsboken_9789139114840_k3.pdf"));
          var model = new BASContext(false);
 
-         ExtraheraKontonummer(model, pdfDoc, 62, 433);
+         ExtraheraKontonummer(model, pdfDoc, 64, 438);
 
          model.SaveChanges();
 
@@ -48,6 +48,7 @@ namespace PDFReader
             processor.ProcessPageContent(p);
 
             string extractedText = extractionStrategy.GetResultantText().Trim();
+            extractedText = extractedText.Replace((char)8211, '-');  // Typografiskt bindestreck ersätts med normalt
 
             if (extractedText != "")
             {
@@ -56,7 +57,7 @@ namespace PDFReader
                foreach (var kontotext in extractedText.Split(new[] { '\n' }))
                {
                   string kontonr = kontotext.Trim().Split()[0].Trim();
-
+                  kontonr = kontonr.Split(new[] {'-'})[0].Trim();
                   // Console.WriteLine("{0} <- {1}", kontonr, kontotext);
 
 

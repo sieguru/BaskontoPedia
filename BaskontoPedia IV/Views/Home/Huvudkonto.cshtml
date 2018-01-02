@@ -10,15 +10,15 @@
         {
             <h2>
                 @(Model.Account)
-                @if (Model.Account.LastYear != "2017")
+                @if (Model.Account.LastYear != Model.CurrentYear)
                 {
-                    <strong>(Kontot saknas i BAS 2017) se @Model.Account.LastYear </strong>
+                    <strong>(Kontot saknas i BAS @Model.CurrentYear) se @Model.Account.LastYear </strong>
                 }
             </h2>
         }
         else
         {
-            <h2>Kontot saknas i BAS 2017</h2>
+            <h2>Kontot saknas i BAS @Model.CurrentYear</h2>
         }
     </div>
     <div class="col-md-2">
@@ -43,16 +43,16 @@
         <h4>Kontots innehåll</h4>
         @if (!string.IsNullOrEmpty(Model.Account.SidaIBokforingsboken))
         {
-            <p>
-                Se Svensk Redovisning Bokföringssboken 2018, s. @Model.Account.SidaIBokforingsboken.
-            </p>
+        <p>
+            Se Svensk Redovisning Bokföringssboken @Model.CurrentYear, s. @Model.Account.SidaIBokforingsboken.
+        </p>
         }
 
         @if (!string.IsNullOrEmpty(Model.Account.SidaIBokslutsboken))
         {
             <h4>Kontots innehåll</h4>
             <p>
-                Se Svensk Redovisning Bokslutsboken 2018, s. @Model.Account.SidaIBokslutsboken.
+                Se Svensk Redovisning Bokslutsboken @Model.CurrentYear, s. @Model.Account.SidaIBokslutsboken.
             </p>
         }
         @if (Model.History != null)
