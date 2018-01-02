@@ -8,13 +8,22 @@
     <div class="col-md-10">
         @if (Model.Account != null)
         {
-            <h2>
-                @(Model.Account)
-                @if (Model.Account.LastYear != Model.CurrentYear)
-                {
-                    <strong>(Kontot saknas i BAS @Model.CurrentYear) se @Model.Account.LastYear </strong>
-                }
-            </h2>
+            if (Model.Account.LastYear != Model.CurrentYear)
+            {
+                <h2>
+                    <s>
+                        @(Model.Account)
+                    </s>
+                </h2>
+                <h4>Kontot saknas i BAS @Model.CurrentYear. Se BAS @Model.Account.LastYear </h4>
+            }
+            else
+            {
+                <h2>
+                    @(Model.Account)
+                </h2>
+
+            }
         }
         else
         {
@@ -43,9 +52,9 @@
         <h4>Kontots innehåll</h4>
         @if (!string.IsNullOrEmpty(Model.Account.SidaIBokforingsboken))
         {
-        <p>
-            Se Svensk Redovisning Bokföringssboken @Model.CurrentYear, s. @Model.Account.SidaIBokforingsboken.
-        </p>
+            <p>
+                Se Svensk Redovisning Bokföringssboken @Model.CurrentYear, s. @Model.Account.SidaIBokforingsboken.
+            </p>
         }
 
         @if (!string.IsNullOrEmpty(Model.Account.SidaIBokslutsboken))
@@ -103,9 +112,16 @@
                         @*@Html.DisplayFor(modelItem => item.AccountID)*@
                     </td>
                     <td>
-                        @Html.DisplayFor(modelItem => item.Name)
+                        @if (item.LastYear != Model.CurrentYear)
+                        {
+                            <s>@Html.DisplayFor(modelItem => item.Name)</s>
+                        }
+                        else
+                        {
+                            @Html.DisplayFor(modelItem => item.Name)
+                        }
                     </td>
-                    <td>Gruppkonto</td>
+                    <td></td>
                 </tr>
             }
 
