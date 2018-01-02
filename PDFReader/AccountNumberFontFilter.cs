@@ -41,19 +41,17 @@ namespace PDFReader
                // Marginaltext
                //   bl.a. kontonummer för huvudkonton
                // Underkonton
-               string text = renderInfo.GetText();
 
-               if (Regex.IsMatch(text, @"^[1-8][0-9]{0,3}\s.*"))
+               string text = renderInfo.GetText().Trim();
+
+               if (Regex.IsMatch(text, @"^[1-8][0-9]{0,3}.*"))
                {
-                  if (fontSize == 14)  // Get font size
+                  if (fontSize >= 9)
                   {
+                     //Console.WriteLine("GetText: {0} {1}", renderInfo.GetText(), fontName);
                      return true;
                   }
-                  else if (fontSize == 9)  // Get font size
-                  {
-                     return true;
-                  }
-                  else if (fontSize == 8)  // Get font size
+                  else
                   {
                      // Skräp extraherat från brödtext
                      //WriteRenderInfo(renderInfo);

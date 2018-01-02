@@ -31,6 +31,9 @@ namespace PDFReader
 
       private static void ExtraheraKontonummer(BASContext model, PdfDocument pdfDoc, int startPage, int endPage)
       {
+         //startPage = 265;
+         //endPage = 265;
+
          // Gå igenom konteringsinstruktionerna och extrahera alla konton
          for (int page = startPage; page <= endPage; page++)
          {
@@ -44,38 +47,63 @@ namespace PDFReader
             var processor = new PdfCanvasProcessor(listener);
             processor.ProcessPageContent(p);
 
-            string extractedText = extractionStrategy.GetResultantText();
+            string extractedText = extractionStrategy.GetResultantText().Trim();
 
             if (extractedText != "")
             {
                //Console.WriteLine("Page: {0}", page);
-
+               
                foreach (var kontotext in extractedText.Split(new[] { '\n' }))
                {
-                  string kontonr = kontotext.Split()[0].Trim();
-                  //Console.WriteLine(kontonr);
+                  string kontonr = kontotext.Trim().Split()[0].Trim();
 
-                  var konto = (from k in model.AccountNumbers
-                               where k.AccountId == kontonr
-                               select k).FirstOrDefault();
+                  // Console.WriteLine("{0} <- {1}", kontonr, kontotext);
 
-                  if (konto == null)
+
+                  if (kontonr != "")
                   {
-                     Console.WriteLine("Konto saknas i databasen: {0}", kontonr);
-                  }
-                  else
-                  {
+                     UpdateAccountInDatabase(model, page, kontonr);
 
-                     if (string.IsNullOrEmpty(konto.SidaIBokforingsboken))
+                     if ((kontonr.Length == 4) && (kontonr.Substring(3, 1) == "0"))
                      {
-                        konto.SidaIBokforingsboken = page.ToString();
-                     }
-                     else
-                     {
-                        konto.SidaIBokforingsboken += ", " + page.ToString();
-                        Console.WriteLine("Konto {0} förekommer på flera sidor: {1}", kontonr, konto.SidaIBokforingsboken);
+                        UpdateAccountInDatabase(model, page, kontonr.Substring(0,3));
                      }
                   }
+               }
+            }
+         }
+      }
+
+      private static void UpdateAccountInDatabase(BASContext model, int page, string kontonr)
+      {
+         //Console.WriteLine(kontonr);
+         var konto = (from k in model.AccountNumbers
+                      where k.AccountId == kontonr
+                      select k).FirstOrDefault();
+
+         if (konto == null)
+         {
+            Console.WriteLine("Konto saknas i databasen: {0}", kontonr);
+         }
+         else
+         {
+
+            if (string.IsNullOrEmpty(konto.SidaIBokforingsboken))
+            {
+               //Console.WriteLine("Konto {0} uppdaterat.", kontonr);
+               konto.SidaIBokforingsboken = page.ToString();
+            }
+            else
+            {
+               if (konto.SidaIBokforingsboken == page.ToString())
+               {
+                  // Kontot förekommer flera gånger på samma sida - upprepa inte sidreferensen
+                  //Console.WriteLine("Konto {0} har redan korrekt sidreferens.", kontonr);
+               }
+               else
+               {
+                  konto.SidaIBokforingsboken += ", " + page.ToString();
+                  Console.WriteLine("Konto {0} förekommer på flera sidor: {1}", kontonr, konto.SidaIBokforingsboken);
                }
             }
          }

@@ -4,7 +4,7 @@
     ViewBag.Title = "Kontogrupp";
 }
 
-<h2>Kontogrupp</h2>
+<h2>Kontogrupp @Model.Group.AccountId @Model.Group.Name </h2>
 
 
 <table class="table">
@@ -16,7 +16,7 @@
         <th>Företag med mer än ett underkonto</th>
    </tr>
 
-    @foreach (var item in Model.Accounts)
+    @foreach (var item in Model.Group.SubAccounts)
     {
     <tr>
         <td>

@@ -5,13 +5,13 @@
 }
 <div class="container">
     <div class="row">
-        @if (Model.MainAccount != null)
+        @if (Model.Account != null)
         {
         <h2>
-            @(Model.MainAccount.AccountId)x @Model.MainAccount.Name
-            @if (Model.MainAccount.LastYear != "2017")
+            @(Model.Account.AccountId)x @Model.Account.Name
+            @if (Model.Account.LastYear != "2017")
             {
-            <strong>(Kontot saknas i BAS 2017) @Model.MainAccount.LastYear </strong>
+            <strong>(Kontot saknas i BAS 2017) se @Model.Account.LastYear </strong>
             }
         </h2>
         }
@@ -33,18 +33,18 @@
         <div class="row">
             <div class="col-md-6">
                 <h4>Kontots innehåll</h4>
-                @if (!string.IsNullOrEmpty(Model.MainAccount.SidaIBokforingsboken))
+                @if (!string.IsNullOrEmpty(Model.Account.SidaIBokforingsboken))
     {
             <p>
-                Se Svensk Redovisning Bokföringssboken 2018, s. @Model.MainAccount.SidaIBokforingsboken.
+                Se Svensk Redovisning Bokföringssboken 2018, s. @Model.Account.SidaIBokforingsboken.
             </p>
 }
 
-                @if (!string.IsNullOrEmpty(Model.MainAccount.SidaIBokslutsboken))
+                @if (!string.IsNullOrEmpty(Model.Account.SidaIBokslutsboken))
     {
             <h4>Kontots innehåll</h4>
             <p>
-                Se Svensk Redovisning Bokslutsboken 2018, s. @Model.MainAccount.SidaIBokslutsboken.
+                Se Svensk Redovisning Bokslutsboken 2018, s. @Model.Account.SidaIBokslutsboken.
             </p>
 }
                 @if (Model.History != null)
@@ -82,11 +82,11 @@
                         <th>Kommentar</th>
                     </tr>
 
-                    @foreach (var item in Model.SubAccounts)
+                    @foreach (var item in Model.Account.SubAccounts)
         {
             <tr>
                 <td>
-                    @Html.ActionLink(item.AccountID, "Huvudkonto/" + item.AccountID, "Home")
+                    @Html.ActionLink(item.AccountId, "Huvudkonto/" + item.AccountId, "Home")
                     @*@Html.DisplayFor(modelItem => item.AccountID)*@
                 </td>
                 <td>
@@ -136,11 +136,11 @@
                 <div class="panel panel-default">
                     <div class="panel-heading">Placering i kontoplanen</div>
                     <div class="panel-body">
-                        <p>@Model.Class.AccountId @Model.Class.Name</p>
-                        <p>&nbsp;&nbsp;@Html.ActionLink(Model.Group.AccountId + " " + Model.Group.Name, "Kontogrupp/" + Model.Group.AccountId, "Home")</p>
-                        @if (Model.MainAccount != null)
+                        <p>@Model.Account.Parent.Parent.AccountId @Model.Account.Parent.Parent.Name</p>
+                        <p>&nbsp;&nbsp;@Html.ActionLink(Model.Account.Parent.AccountId + " " + Model.Account.Parent.Name, "Kontogrupp/" + Model.Account.Parent.AccountId, "Home")</p>
+                        @if (Model.Account != null)
                         {
-                            @*<p>&nbsp;&nbsp;&nbsp;&nbsp;@Model.MainAccount.MainAccount @Model.MainAccount.MainAccount</p>*@
+                           @*<p>&nbsp;&nbsp;&nbsp;&nbsp;@Model.MainAccount.MainAccount @Model.MainAccount.MainAccount</p>*@
                         }
                     </div>
                 </div>
@@ -152,13 +152,13 @@
                     </div>
                 </div>
 
-                @if (Model.MainAccount.XbrlElements.Count > 0)
+                @if (Model.Account.XbrlElements.Count > 0)
                 {
                 <div class="panel panel-default">
-                    <div class="panel-heading" data-toggle="tooltip" title="(Enligt bolagsverkets taxonomi 2017-09-30)">Tillhör följande XBRL-element</div>
+                    <div class="panel-heading" data-toggle="tooltip" title="(Enligt bolagsverkets taxonomi 2017-09-30)">Ingår i följande XBRL-element</div>
                     <div class="panel-body">
                         <div class="container-fluid">
-                            @foreach (var e in Model.MainAccount.XbrlElements)
+                            @foreach (var e in Model.Account.XbrlElements)
                             {
                             <div class="row">
                                 <div class="col-md-6">

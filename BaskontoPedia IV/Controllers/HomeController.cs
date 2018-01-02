@@ -17,14 +17,11 @@ namespace BaskontoPedia_IV.Controllers
 
    public class AccountViewModel
    {
-      public AccountNumber MainAccount { get; set; }
-      public AccountNumber Class { get; set; }
-      public AccountNumber Group { get; set; }
+      public AccountNumber Account { get; set; }
 
       //public IEnumerable<Account> HistoricAccounts { get; set; }
 
       public List<History> History;
-      public IEnumerable<Account> SubAccounts { get; set; }
       public IEnumerable<UsedAccount> UsedAccounts { get; set; }
 
       public AccountViewModel()
@@ -36,10 +33,10 @@ namespace BaskontoPedia_IV.Controllers
 
    public class AccountGroupViewModel
    {
-      //public Account MainAccount { get; set; }
+      public AccountNumber Group { get; set; }
 
       //public IEnumerable<Account> HistoricAccounts { get; set; }
-      public IEnumerable<AccountNumber> Accounts { get; set; }
+    //  public IEnumerable<AccountNumber> Accounts { get; set; }
       //public IEnumerable<Account> UsedAccounts { get; set; }
 
 
@@ -112,29 +109,17 @@ namespace BaskontoPedia_IV.Controllers
          var kontoVM = new AccountViewModel();
 
 
-         kontoVM.MainAccount = (from k in model.AccountNumbers
+         kontoVM.Account = (from k in model.AccountNumbers
                                 where k.AccountId == id
                                 select k).FirstOrDefault();
 
-         string classId = id.Substring(0, 1);
-         kontoVM.Class = (from k in model.AccountNumbers
-                                where k.AccountId == id.Substring(0,1)
-                                select k).FirstOrDefault();
-         string groupId = id.Substring(0, 2);
-         kontoVM.Group = (from k in model.AccountNumbers
-                                where k.AccountId == id.Substring(0, 2)
-                          select k).FirstOrDefault();
-
+ 
          var histKonton = from k in model.Accounts
                           where k.AccountID == id
                           orderby k.Year
                           select k;
 
          kontoVM.History = SummarizeHistory(histKonton);
-
-         kontoVM.SubAccounts = from k in model.Accounts
-                               where k.MainAccount == id && k.Year == "2017"
-                               select k;
 
          var usedAccounts = new List<UsedAccount>();
 
@@ -202,22 +187,10 @@ namespace BaskontoPedia_IV.Controllers
          var kontoGruppVM = new AccountGroupViewModel();
 
 
-         var selectedAccounts = new List<AccountNumber>();
-
-         foreach (var k in model.AccountNumbers)
-         {
-            if (k.AccountId.StartsWith(id) && k.AccountId.Length == 3)
-            {
-               //if (k.AccountId == k.MainAccount)
-               {
-                  selectedAccounts.Add(k);
-               }
-            }
-         }
-
-
-         kontoGruppVM.Accounts = selectedAccounts;
-
+         kontoGruppVM.Group = (from k in model.AccountNumbers
+                               where k.AccountId == id
+                               select k).FirstOrDefault();
+   
          return View(kontoGruppVM);
       }
       public ActionResult Xbrl(string id)

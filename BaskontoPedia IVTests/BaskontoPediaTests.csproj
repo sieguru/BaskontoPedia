@@ -85,9 +85,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\BaskontoPedia IV\BaskontoPedia IV.csproj">
+    <ProjectReference Include="..\BaskontoPedia IV\BaskontoPedia.csproj">
       <Project>{8979B11A-0671-460E-B4FB-F84CAE0DD80B}</Project>
-      <Name>BaskontoPedia IV</Name>
+      <Name>BaskontoPedia</Name>
     </ProjectReference>
     <ProjectReference Include="..\Database\Database.csproj">
       <Project>{b5514431-5972-4234-b0e4-698573659564}</Project>

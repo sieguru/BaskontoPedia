@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27130.2010
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BaskontoPedia IV", "BaskontoPedia IV\BaskontoPedia IV.csproj", "{8979B11A-0671-460E-B4FB-F84CAE0DD80B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BaskontoPedia", "BaskontoPedia IV\BaskontoPedia.csproj", "{8979B11A-0671-460E-B4FB-F84CAE0DD80B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PDFReader", "PDFReader\PDFReader.csproj", "{8ECF3D25-6B9C-4303-9724-9670E89D077A}"
 EndProject
@@ -11,7 +11,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LaddaXBRLTaxonomi", "LaddaX
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConnextXbrl", "ConnextXbrl\ConnextXbrl.csproj", "{95EF9B25-0E2E-4B49-8A8E-15958B0CC8F5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BaskontoPedia IVTests", "BaskontoPedia IVTests\BaskontoPedia IVTests.csproj", "{23360AAE-DCDE-4265-A4AB-9D9C6C0836CD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BaskontoPediaTests", "BaskontoPedia IVTests\BaskontoPediaTests.csproj", "{23360AAE-DCDE-4265-A4AB-9D9C6C0836CD}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Database", "Database\Database.csproj", "{B5514431-5972-4234-B0E4-698573659564}"
 EndProject

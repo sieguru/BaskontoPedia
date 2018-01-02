@@ -16,6 +16,8 @@ namespace SQLDatabase
       {
          this.XbrlElements = new HashSet<XBRLElement>();
          this.Accounts = new HashSet<Account>();
+         this.SubAccounts = new HashSet<AccountNumber>();
+         this.Sokord = new HashSet<Sokord>();
       }
 
       [Key]
@@ -24,9 +26,15 @@ namespace SQLDatabase
       public string LastYear { get; set; }
       public string SidaIBokforingsboken { get; set; }
       public string SidaIBokslutsboken { get; set; }
-      public virtual ICollection<Account> Accounts { get; set; }    // BAS-konton som ingår under detta XBRL-element:
-      public virtual ICollection<XBRLElement> XbrlElements { get; set; }    // XBRL-element som omfattar detta BAS-konto:
+
+      public virtual ICollection<Account> Accounts { get; set; }    // BAS-konton som ingår under detta kontonummer:
+      public virtual ICollection<XBRLElement> XbrlElements { get; set; }    // XBRL-element som omfattar detta kontonummer:
       public virtual ICollection<Sokord> Sokord { get; set; }    // Sökord som omfattar detta BAS-konto:
+
+      public virtual string ParentId { get; set; }  // Self-reference
+      [ForeignKey("ParentId")]
+      public virtual ICollection<AccountNumber> SubAccounts { get; set; }    // BAS-konton som ingår under detta XBRL-element:
+      public virtual AccountNumber Parent { get; set; }    // BAS-konton som ingår under detta XBRL-element:
    }
 
    public class Account

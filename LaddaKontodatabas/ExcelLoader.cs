@@ -128,12 +128,12 @@ namespace JournalMatcher
          kontonr = kontonr.Trim();
          kontonamn = kontonamn.Trim();
 
-         if (!Regex.IsMatch(kontonr, @"^[1-8][0-9]{0,3}"))
+         if (!Regex.IsMatch(kontonr, @"^[1-8][0-9]{0,3}$"))
          {
             Console.WriteLine("Ogiltigt konto {0} - {1}", kontonr, kontonamn);
          }
 
-         Console.WriteLine("{0} - {1}", kontonr, kontonamn);
+         //Console.WriteLine("{0} - {1}", kontonr, kontonamn);
          var acc = new Account
          {
             AccountID = kontonr,
@@ -160,6 +160,21 @@ namespace JournalMatcher
 //            model.AccountNumbers.Add(accno);
 
             allAccounts.Add(kontonr, accno);
+
+            // Lägg till under "parent"
+
+            string parentNr = kontonr.Substring(0, kontonr.Length - 1);
+
+            if (!allAccounts.ContainsKey(parentNr))
+            {
+               Console.WriteLine("Parent saknas för {0} - {1}", kontonr, kontonamn);
+            }
+            else
+            {
+               var parent = allAccounts[parentNr];
+               accno.Parent = parent;
+               parent.SubAccounts.Add(accno);
+            }
          }
          else
          {
